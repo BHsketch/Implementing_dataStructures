@@ -1,6 +1,7 @@
 #include<iostream>
 #include<string>
 #include<cstdlib>
+#include<cmath>
 
 template<typename kT, typename T>
 class pair
@@ -15,6 +16,8 @@ class pair
         srand(key);
         hashoutput = 1+(rand()%100);
     }
+
+    //probability of collisions is 1/100 with the current hash functions, which is very bad. 
 
     pair(const std::string key) const
     {
@@ -31,7 +34,15 @@ class pair
 
     pair(const float key)
     {
-
+        int hashoutput;
+        int integralpart = trunc(key);
+        float decimalpart = key - trunc(key);
+        for(int i=0; (decimalpart - trunc(decimalpart))>0 ; i++)
+        {
+            decimalpart = 10*decimalpart;
+        }
+        srand((int)integralpart + (int)decimalpart);
+        hashoutput=1+(rand()%100);
     }
 
     pair(const double key)
@@ -48,6 +59,5 @@ class unordered_map_bh
 
 int main()
 {
-    unordered_map_bh<std::string, int> agemap;
-    //map1["Sheldon"]=18;   
+    unordered_map_bh<std::string, int> agemap;   
 }
