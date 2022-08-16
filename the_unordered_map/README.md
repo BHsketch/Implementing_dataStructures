@@ -18,3 +18,12 @@ an unordered map has an average time complexity of O(1)
 <li>that bucket will be a linked list at index hashnum of the array of pairs</li>
 <li>The pair object will be appended to the end of that linked list</li>
 </ul>
+
+#### Concepts used and problems faced:
+<ul>
+<li>lvalues and rvalues: when trying to overload the [] and = operators to assign the key and value, I keep getting the "expression should be a modifiable lvalue" error</li>
+<li></li>
+<li></li>
+<li></li>
+<li></li>
+</ul>
