@@ -16,29 +16,31 @@ class unordered_map_bh
 
     public:
 
-    set_tempkey(kT valueToBeSetTo)
+    void gettempkey()
+    {
+        std::cout<<"tempkey is "<<tempkey<<std::endl;
+    }
+
+    void gettempval()
+    {
+        std::cout<<"tempval is "<<tempval<<std::endl;
+    }
+
+    void set_tempkey(kT valueToBeSetTo) //function to set tempkey from outside the class
     {
         tempkey=valueToBeSetTo;
     }
 
-    set_tempval(T valueToBeSetTo)
+    void set_tempval(T valueToBeSetTo) //function to set tempvalue from outside the class
     {
         tempval=valueToBeSetTo;
     }
 
-    unordered_map_bh<kT, T> * operator[] (kT inputkey)
+    T& operator[] (const kT& inputkey) //overloading the [] operator to store the argument in the tempkey variable
     {
         (this->tempkey)=inputkey;
-        std::cout<<"tempkey is "<<tempkey<<std::endl;
-        return this;
-    }
-
-    void operator= (T inputvalue)
-    {
-        //unordered_map_bh<kT, T> *tempptr =  this;
-        //(*this).set_tempval(inputvalue);
-        (this->tempval)=inputvalue;
-        std::cout<<"tempval is "<<tempval<<std::endl;
+        T& valref = this->tempval;
+        return valref; // returning the object we are working with; it will be the lvalue in agemap["sheldon"] = 25
     }
     
 };
@@ -46,5 +48,7 @@ class unordered_map_bh
 int main()
 {
     unordered_map_bh<std::string, int> agemap;
-    //agemap["Sheldon"]=25;
+    agemap["Sheldon"]=25;
+    agemap.gettempkey();
+    agemap.gettempval();
 }
