@@ -19,7 +19,7 @@ class pair
 
     //probability of collisions is 1/100 with the current hash functions, which is very bad. 
 
-    pair(const std::string key) const //hash function if the key is a string
+    pair(std::string key)//hash function if the key is a string
     {
         int sum=0;
         for(int i=0; key[i]!='\0'; i++)
@@ -42,16 +42,6 @@ class pair
         srand((int)integralpart + (int)decimalpart);
         hashoutput=1+(rand()%100);
     }
-
-    pair(const double key)
-    {
-
-    }
-
-    void pairallocate(hashoutput)
-    {
-
-    }
 };
 
 template<typename kT, typename T>
@@ -66,19 +56,46 @@ class ListNode{
 template<typename kT, typename T>
 class unordered_map_bh
 {
+    private:
     kT tempkey;
     T tempval;
 
-    void operator[] (kT inputkey)
+    public:
+
+    void gettempkey()
     {
-        (this->tempkey)=inputkey;
+        std::cout<<"tempkey is "<<tempkey<<std::endl;
     }
 
-    void operator= (T value)
+    void gettempval()
+    {
+        std::cout<<"tempval is "<<tempval<<std::endl;
+    }
+
+    void set_tempkey(kT valueToBeSetTo) //function to set tempkey from outside the class
+    {
+        tempkey=valueToBeSetTo;
+    }
+
+    void set_tempval(T valueToBeSetTo) //function to set tempvalue from outside the class
+    {
+        tempval=valueToBeSetTo;
+    }
+
+    T& operator[] (const kT& inputkey) //overloading the [] operator to store the argument in the tempkey variable
+    {
+        //pair<kT, T> temppair;
+        (this->tempkey)=inputkey;
+        T& valref = this->tempval;
+        return valref; // returning the object we are working with; it will be the lvalue in agemap["sheldon"] = 25
+    }
     
 };
 
 int main()
 {
-    unordered_map_bh<std::string, int> agemap;   
+    unordered_map_bh<std::string, int> agemap; 
+    agemap["sheldon"]=25;
+    agemap.gettempkey();
+    agemap.gettempval();  
 }
