@@ -2,6 +2,8 @@
 #include<string.h>
 #include<stdlib.h>
 
+//Implementing a hashmap using chaining
+
 int hash(char* str)
 {
     int i;
