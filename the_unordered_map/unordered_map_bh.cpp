@@ -4,52 +4,39 @@
 #include<cmath>
 
 template<typename kT, typename T>
-class pair
-{
+class pair{
     public:
-    const kT key;
+    kT key;
     T value;
-    int hashoutput;
+};
 
-    int gethashoutput()
-    {
-        return hashoutput;
-    }
+template<typename kT, typename T>
+class listnode{
+    public:
+    pair<kT, T> nodepair;
+    listnode<kT, T>* next;
+};
 
-    T& getvalref()
-    {
-        T& valrefpair = value;
-        return valrefpair;
-    }
+template<typename kT, typename T>
+class unordered_map_bh{
 
-    kT& getkeyref()
-    {
-        kT& keyrefpair = key;
-        return keyrefpair;
-    }
+    public:
+    listnode<kT, T>* H[100] = {nullptr};
+    //kT tempkey;
+    int index;
 
-    void setkey(kT pairkey)
+    void processkey(int key) //hash function if the key is an integer
     {
-        (this->key)=pairkey;
-    }
-
-    void setval(T pairval)
-    {
-        (this->val)=pairval;
-    }
-
-    pair(const int key) //hash function if the key is an integer
-    {
-        (this->key)=key;
         srand(key);
-        hashoutput = 1+(rand()%100);
+        index = 1+(rand()%100);
     }
 
     //probability of collisions is 1/100 with the current hash functions, which is very bad. 
 
-    pair(std::string key)//hash function if the key is a string
+    void processkey(std::string key)//hash function if the key is a string
     {
-        (this->key)=key;
+        std::cout<<"process key: ";
+    
         int sum=0;
         for(int i=0; key[i]!='\0'; i++)
         {
@@ -57,12 +44,13 @@ class pair
             sum=sum+ascii;
         }
         srand(sum);
-        hashoutput=1+(rand()%100);
+        index=1+(rand()%100);
+
+        std::cout<<index<<std::endl;
     }
 
-    pair(const float key) //hash function if the key is a float
+    void processkey(float key) //hash function if the key is a float
     {
-        (this->key)=key;
         int integralpart = trunc(key);
         float decimalpart = key - trunc(key);
         for(int i=0; (decimalpart - trunc(decimalpart))>0 ; i++)
@@ -70,112 +58,95 @@ class pair
             decimalpart = 10*decimalpart;
         }
         srand((int)integralpart + (int)decimalpart);
-        hashoutput=1+(rand()%100);
-    }
-};
-
-template<typename kT, typename T>
-class ListNode{
-
-    private:
-
-    public:
-    pair<kT, T> nodepair;
-    ListNode<kT, T> *next;
-
-    // Pair<kT, T>* getnodepair()
-    // {
-    //     Pair<kT, T>& nodepairreturn = nodepair;
-    //     return nodepairreturn;
-    // }
-
-    int gethashoutput()
-    {
-        int output = nodepair.gethashoutput();
-        return output;
+        index=1+(rand()%100);
     }
 
-    T& getvalref()
+     //overloading the [] operator to return an lvalue corresponding to the variable that stores our value
+    T& operator[](const kT &tempkey)
     {
-        T& valrefnode = nodepair.getvalref();
-        return valrefnode;
-    }
+        processkey(tempkey);
+        listnode<kT, T>* current;
+        listnode<kT, T>* parentnode = nullptr;
+        listnode<kT, T>* tempnode;
+        int foundkey;
 
-    kT& getkeyref()
-    {
-        kT& keyrefnode = nodepair.getkeyref();
-        return keyrefnode;
-    }
+        current = H[index];
 
-    void setnext(ListNode * nextnode)
-    {
-        next=nextnode;
-    }
-
-    void setpairkey(kT nodekey)
-    {
-        nodepair.setkey(nodekey);
-    }
-
-    ListNode<kT, T>()
-    {
-        nodepair.setkey(NULL);
-        setnext(nullptr);
-    }
-
-    // ListNode(kT nodekey) : next(nullptr) 
-    // {
-    //     nodepair.setkey(nodekey);
-    // }
-};
-
-template<typename kT, typename T>
-class unordered_map_bh
-{
-    private:
-    ListNode<kT, T>* H[100] = {nullptr}; // to store the Heads of all corresponding linked lists
-    ListNode<kT, T>* C[100] = {nullptr};// to store the addrest of the last listnode in the corresponding linked list i.e. the Current node
-
-    public:
-
-    void getkeyval()
-    {
-        for(int i=0; i<100; i++)
+        foundkey = 0;
+        for(int i=0; current!=nullptr; i++)
         {
-            if(H[i]!=nullptr)
+            if((current->nodepair).key == tempkey)
             {
-                std::cout<<"key: "<<(H[i]->getkeyref())<<std::endl;
-                std::cout<<"value: "<<(H[i]->getvalref())<<std::endl;
+                foundkey = 1;
+                break;
             }
+            parentnode = current;
+            current = current->next;
         }
-    }
+        //current is either pointing to the found node or to null(because the node doesn't exist)
 
-    T& operator[] (const kT& inputkey) //overloading the [] operator to store the argument in the tempkey variable
-    {
-        ListNode<kT, T>* tempnode = new ListNode<kT, T>; //creates a new listnode
-        tempnode->setpairkey(inputkey);//sets the key variable in the pair inside that listnode = input
+        //if node doesn't exist, create one and set current to point to it
+        if(!foundkey)
+        {
+            std::cout<<"key not found"<<std::endl;
+
+            if(parentnode == nullptr)
+            {
+                //tempnode = (listnode<kT, T>* )malloc(sizeof(listnode<kT,T>));
+                tempnode = new listnode<kT, T>;
+                tempnode->next = nullptr;
+                (tempnode->nodepair).key = tempkey;
+                 
+                H[index] = tempnode;
+            }else{
+                //tempnode = (listnode<kT, T>* )malloc(sizeof(listnode<kT,T>));
+                tempnode = new listnode<kT, T>;
+                tempnode->next = nullptr;
+                (tempnode->nodepair).key = tempkey;
+                //inserting the node at the end
+                parentnode->next = tempnode;
+            }
+            current = tempnode;
+        }
+        //current is now pointing to the required node
+
+        return (current->nodepair).value;
         
-        int hashoutput=tempnode->gethashoutput();
+    }
+};
 
-        if((H[hashoutput])==nullptr)
-        {
-            H[hashoutput]=tempnode;
-            C[hashoutput]=tempnode;
-        }else if(H[hashoutput]!=nullptr)
-        {
-            C[hashoutput]->next = tempnode;
-            C[hashoutput]=tempnode;
-        }//appends tempnode to the linked list that starts from H[hashoutput]. tempnode is now connected
 
-        T& valref = (tempnode->getvalref()); //sets a reference valref to the value variable inside the pair in tempnode
-
-        return valref;
-    }//since this returns a reference to the actual val variable, the expression agemap["sheldon"] allows us to both assign, and access the value, which is what we want
-    };
 
 int main()
 {
     unordered_map_bh<std::string, int> agemap;
     agemap["sheldon"]=25;
-    agemap.getkeyval();
+    std::cout<<agemap["sheldon"]<<std::endl<<std::endl;
+    agemap["dolensh"]=15;
+    std::cout<<agemap["dolensh"]<<std::endl<<std::endl;
+    agemap["rona"]=15;
+    std::cout<<agemap["rona"]<<std::endl<<std::endl;
+    agemap["sheldon"]=35;
+    std::cout<<agemap["sheldon"]<<std::endl<<std::endl;
+
+    int age = agemap["sheldon"];
+    std::cout<<"age: "<<age;
 }
+
+/*
+algorithm:
+1. the user enters: agemap["Jupiter"] = 19
+2. read the argument passed to agemap via operator overloading the [] operator, and set a key variable to the input
+3. put the key through a hash function to determine the index -> store that index in a variable called 'index'
+4. search the linked list at that index for the mentioned key
+5. If found, return that variable (either to be used somewhere or to be overwritten if the user entered the expression in step 1)
+6. Else, if end of the linked list is reached without finding the key, (end pointed to by 'current')
+    create a new listnode called tempnnode
+    set the key variable equal to the input key
+    set the next pointer to null
+    set the last node of the linked list (current) to point to tempnode
+    set the pointer of C at the corresponding index to point to tempnode
+    retun a reference to its value variable (it is an lvalue) so it cane be assigned its value throught the = operator in the expression that the user entered
+*/
+
+// In order to create an iterator, what if the end of a linked list points to the head node of the linked list at the next index?
